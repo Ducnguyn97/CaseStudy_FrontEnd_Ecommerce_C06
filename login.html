@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | MiniStore</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Lato', sans-serif;
+      background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      width: 380px;
+      padding: 40px;
+      background-color: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .login-container:hover {
+      transform: translateY(-3px);
+    }
+
+    .login-container h3 {
+      text-align: center;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 25px;
+    }
+
+    .form-control {
+      border-radius: 12px;
+      padding: 12px 15px;
+      font-size: 0.95rem;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-control:focus {
+      border-color: #5a9bd5;
+      box-shadow: 0 0 5px rgba(90,155,213,0.3);
+    }
+
+    .btn-primary {
+      width: 100%;
+      border-radius: 12px;
+      background-color: #5a9bd5;
+      border: none;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #3b82c4;
+    }
+
+    .text-link {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.9rem;
+    }
+
+    #msg {
+      margin-top: 15px;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <h3>Đăng Nhập</h3>
+  <form id="loginForm">
+    <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" required>
+    <input type="password" class="form-control" id="password" placeholder="Mật khẩu" required>
+    <button type="submit" class="btn btn-primary">Đăng Nhập</button>
+    <div class="text-link">
+      Chưa có tài khoản? <a href="register.html">Đăng Ký</a>
+    </div>
+  </form>
+  <div id="msg" class="text-center"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+  $("#loginForm").submit(function(e){
+    e.preventDefault();
+
+    const username = $("#username").val();
+    const password = $("#password").val();
+
+    $.ajax({
+      url: "http://localhost:8080/api/auth/login", // Đúng endpoint BE
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({ username, password }),
+
+      success: function(res){
+        // Lưu token và thông tin user vào localStorage
+        localStorage.setItem("token", res.token);
+        localStorage.setItem("username", res.username);
+        localStorage.setItem("role", res.role);
+
+        $("#msg").html('<span class="text-success">Đăng nhập thành công! Đang chuyển hướng...</span>');
+
+        // Điều hướng theo role
+        if (res.role === "ROLE_ADMIN") {
+          window.location.href = "manager.html";
+        } else {
+          window.location.href = "index.html";
+        }
+      },
+
+      error: function(xhr){
+        $("#msg").html('<span class="text-danger">Sai tên đăng nhập hoặc mật khẩu.</span>');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
