@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | MiniStore</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        body { font-family: 'Lato', sans-serif; background-color: #f4f7f9; margin:0; }
+        .container { display: flex; height: 100vh; }
+        .sidebar { width: 220px; background: #343a40; color: #fff; padding: 20px; flex-shrink: 0; display: flex; flex-direction: column; }
+        .sidebar h4 { color: #fff; font-size: 1.4rem; margin-bottom: 20px; }
+        .sidebar button { display: block; width: 100%; margin-bottom: 10px; background: #495057; color: #fff; border: none; padding: 12px; border-radius: 5px; text-align: left; }
+        .sidebar button:hover { background: #6c757d; cursor: pointer; }
+        #btnLogout { background: #dc3545 !important; margin-top: auto; }
+        .content { flex: 1; padding: 20px; overflow-y: auto; background: #f8f9fa; }
+        table { width: 100%; background: #fff; border-radius: 5px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #007bff !important; color: white; }
+        .btn-sm { font-size: 0.8rem; padding: 5px 10px; margin-right: 5px; }
+        .form-inline input, .form-inline button { margin-right: 5px; margin-bottom: 5px; }
+        .form-inline input { padding: 5px 8px; border-radius: 5px; border: 1px solid #ccc; }
+        .form-inline button { padding: 5px 12px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h4>QUẢN LÝ BÁN HÀNG</h4>
+        <button id="btnUsers">Người Dùng</button>
+        <button id="btnProducts">Sản Phẩm</button>
+        <hr style="border-color: #6c757d;">
+        <button id="btnLogout">Đăng Xuất</button>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <div id="contentArea"></div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function(){
+
+        const contentArea = $("#contentArea");
+        const API_BASE = "http://localhost:8080/api";
+        const token = localStorage.getItem("token");
+        const currentUserRole = localStorage.getItem("role");
+        const username = localStorage.getItem("username");
+        const editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'), {})
+        let editUserId;
+
+        if(!token){
+            contentArea.html('<h4 class="text-danger">Bạn chưa đăng nhập. Vui lòng đăng nhập để truy cập Admin Panel.</h4>');
+            return;
+        }
+
+        function getAuthHeader() {
+            return { "Authorization": `Bearer ${token}` };
+        }
+
+        // --------------- Logout ----------------
+        $("#btnLogout").click(function() {
+            if(confirm("Bạn có chắc muốn đăng xuất?")) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("role");
+                window.location.href = "login.html";
+            }
+        });
+
+        function getRoleName(role) {
+            switch (role) {
+                case 'ROLE_ADMIN':
+                    return '<span class="badge bg-primary">Quản trị</span>';
+                case 'ROLE_USER':
+                    return '<span class="badge bg-secondary">Khách hàng</span>';
+                default:
+                    return '<span class="badge bg-light text-dark">Unknown</span>'
+            }
+        }
+
+        // --------------- Users ----------------
+        let userPage = 0;
+        let userSize = 5;
+
+        function loadUsers(search="") {
+            contentArea.html("<h4>Loading users...</h4>");
+            $.ajax({
+                url: `${API_BASE}/users/search?keyword=${search}&page=${userPage}&size=${userSize}`,
+                type: "GET",
+                headers: getAuthHeader(),
+                success: function(data) {
+                    const users = data.content || data; // nếu API trả paged data hoặc list
+                    let html = `<h4>Users</h4>
+                <div class="form-inline mb-2">
+                    <input type="text" id="searchUser" placeholder="Tìm kiếm username">
+                    <button id="btnSearchUser" class="btn btn-primary btn-sm">Search</button>
+                </div>
+                <table class="table">
+                <thead>
+                    <tr><th>ID</th><th>Tên người dùng</th><th>Email</th><th>SĐT</th><th>Địa Chỉ</th><th>Vai trò</th><th>Chỉnh sửa</th></tr>
+                </thead><tbody>`;
+
+                    users.forEach(u => {
+                        html += `<tr>
+                        <td>${u.id}</td>
+                        <td>${u.username}</td>
+                        <td>${u.email}</td>
+                        <td>${u.phoneNumber}</td>
+                        <td>${u.address}</td>
+                        <td>
+                            ${getRoleName(u.role)}
+                        </td>
+                        <td>`;
+                        if(u.username==="admin"){
+                            html += `<button class="btn btn-warning btn-sm" onclick="editUser(${u.id})">Edit</button>`;
+                        } else if(currentUserRole==="ROLE_ADMIN"){
+                            html += `<button class="btn btn-warning btn-sm" onclick="editUser(${u.id})">Edit</button>
+                                 <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})">Delete</button>`;
+                        }
+                        html += `</td></tr>`;
+                    });
+
+                    html += `</tbody></table>
+                <div class="mb-3">
+                    <button id="prevUser" class="btn btn-secondary btn-sm">Prev</button>
+                    <button id="nextUser" class="btn btn-secondary btn-sm">Next</button>
+                </div>`;
+
+                    contentArea.html(html);
+
+                    // Event search
+                    $("#btnSearchUser").click(function(){
+                        const s = $("#searchUser").val().trim();
+                        userPage = 0;
+                        loadUsers(s);
+                    });
+
+                    $("#prevUser").click(function(){
+                        if(userPage>0){ userPage--; loadUsers($("#searchUser").val().trim()); }
+                    });
+                    $("#nextUser").click(function(){
+                        if(data.totalPages && userPage < data.totalPages-1){ userPage++; loadUsers($("#searchUser").val().trim()); }
+                    });
+                },
+                error: function(xhr){ alert("Error loading users: "+xhr.responseText); }
+            });
+        }
+
+        window.deleteUser = function(id){
+            if(confirm("Bạn có chắc muốn xóa user này?")) {
+                $.ajax({
+                    url:`${API_BASE}/users/${id}`,
+                    type:"DELETE",
+                    headers:getAuthHeader(),
+                    success:function(){ alert("Xóa thành công"); loadUsers(); },
+                    error:function(xhr){ alert(xhr.responseText); }
+                });
+            }
+        };
+
+        window.editUser = function(id){
+            $.ajax({
+                url:`${API_BASE}/users/${id}`,
+                type:"GET",
+                headers:getAuthHeader(),
+                success:function(resp){
+                    console.log('editUser', resp)
+                    $('#userId').val(resp.id);
+                    $('#username').val(resp.username);
+                    $('#email').val(resp.email);
+                    $('#phoneNumber').val(resp.phoneNumber);
+                    $('#address').val(resp.address);
+                    editUserModal.show();
+                },
+                error:function(xhr){ alert(xhr.responseText); }
+            });
+            // const username = prompt("Username mới:");
+            // if(!username) return;
+
+        };
+
+        window.handleSave = function () {
+            const user = {
+                id: $('#userId').val(),
+                username: $('#username').val(),
+                password: $('#password').val(),
+                email: $('#email').val(),
+                phoneNumber: $('#phoneNumber').val(),
+                address: $('#address').val(),
+            }
+
+            $.ajax({
+                url:`${API_BASE}/users/${user.id}`,
+                type:"PUT",
+                headers:getAuthHeader(),
+                contentType:"application/json",
+                data: JSON.stringify(user),
+                success:function(){
+                    alert("Cập nhật thành công");
+                    editUserModal.hide();
+                    loadUsers();
+                },
+                error:function(xhr){ alert(xhr.responseText); }
+            });
+        }
+
+        // --------------- Products ----------------
+        let productPage = 0;
+        let productSize = 5;
+
+        function loadProducts(search="") {
+            contentArea.html("<h4>Loading products...</h4>");
+            $.ajax({
+                url: `${API_BASE}/products?page=${productPage}&size=${productSize}&search=${search}`,
+                type: "GET",
+                headers: getAuthHeader(),
+                success: function(data){
+                    const products = data.content || data;
+                    let html = `<h4>Products</h4>
+                <div class="form-inline mb-2">
+                    <input type="text" id="searchProduct" placeholder="Tìm kiếm sản phẩm">
+                    <button id="btnSearchProduct" class="btn btn-primary btn-sm">Search</button>
+                </div>
+                <table class="table">
+                <thead><tr><th>ID</th><th>Name</th><th>Price</th><th>Description</th><th>Actions</th></tr></thead>
+                <tbody>`;
+                    products.forEach(p=>{
+                        html += `<tr>
+                        <td>${p.id}</td>
+                        <td>${p.name}</td>
+                        <td>${p.price}</td>
+                        <td>${p.description}</td>
+                        <td>`;
+                        if(currentUserRole==="ROLE_ADMIN"){
+                            html += `<button class="btn btn-warning btn-sm" onclick="editProduct(${p.id}, '${p.name}', ${p.price})">Edit</button>
+                                 <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Delete</button>`;
+                        }
+                        html += `</td></tr>`;
+                    });
+                    html += `</tbody></table>
+                <div class="mb-3">
+                    <button id="prevProd" class="btn btn-secondary btn-sm">Prev</button>
+                    <button id="nextProd" class="btn btn-secondary btn-sm">Next</button>
+                </div>`;
+
+                    contentArea.html(html);
+
+                    $("#btnSearchProduct").click(function(){
+                        const s = $("#searchProduct").val().trim();
+                        productPage = 0;
+                        loadProducts(s);
+                    });
+                    $("#prevProd").click(()=>{ if(productPage>0){ productPage--; loadProducts($("#searchProduct").val().trim()); }});
+                    $("#nextProd").click(()=>{ if(data.totalPages && productPage < data.totalPages-1){ productPage++; loadProducts($("#searchProduct").val().trim()); }});
+                },
+                error:function(xhr){ alert(xhr.responseText); }
+            });
+        }
+
+        window.deleteProduct = function(id){
+            if(confirm("Bạn có chắc muốn xóa product này?")) {
+                $.ajax({ url:`${API_BASE}/products/${id}`, type:"DELETE", headers:getAuthHeader(),
+                    success:function(){ alert("Xóa thành công"); loadProducts(); },
+                    error:function(xhr){ alert(xhr.responseText); }
+                });
+            }
+        };
+
+        window.editProduct = function(id,name,price){
+            const newName = prompt("Tên mới:", name);
+            const newPrice = parseFloat(prompt("Giá mới:", price));
+            if(newName && !isNaN(newPrice)){
+                $.ajax({ url:`${API_BASE}/products/${id}`, type:"PUT", headers:getAuthHeader(),
+                    contentType:"application/json", data:JSON.stringify({name:newName,price:newPrice}),
+                    success:function(){ alert("Cập nhật thành công"); loadProducts(); },
+                    error:function(xhr){ alert(xhr.responseText); }
+                });
+            }
+        };
+
+        // -------------------- Event binding --------------------
+        $("#btnUsers").click(()=>{ loadUsers(); });
+        $("#btnProducts").click(()=>{ loadProducts(); });
+
+        // Load default view
+        loadUsers();
+    });
+</script>
+<!-- Modal -->
+<div class="modal fade" id="editUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- ✅ ĐỔI ID form thành editUserForm -->
+            <form id="editUserForm">
+                <input type="hidden" name="id" id="userId">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Sửa người dùng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Tên người dùng</label>
+                        <input type="text" id="username" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" id="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Mật khẩu</label>
+                        <input type="password" id="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Số điện thoại</label>
+                        <input type="text" id="phoneNumber" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Địa chỉ</label>
+                        <input type="text" id="address" class="form-control" required>
+                    </div>
+                    <!-- Thêm chỗ hiển thị thông báo -->
+                    <div id="editErrorMsg" class="text-danger"></div>
+                    <div id="editSuccessMsg" class="text-success"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button> <!-- ✅ dùng type="submit" để JS bắt sự kiện -->
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="js/user-validation.js"></script>
+<script>
+    $(document).ready(() => {
+        handleEditUserForm();
+    });
+</script>
+</body>
+</html>
