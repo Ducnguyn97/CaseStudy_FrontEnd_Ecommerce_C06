@@ -1,0 +1,270 @@
+/* Product Detail Styles */
+
+#productDetail {
+    background: var(--white-color);
+    border: 1px solid var(--gray-color-300);
+    padding: 40px;
+}
+
+/* Product Images */
+.product-images {
+    position: sticky;
+    top: 120px;
+}
+
+.main-image {
+    border: 2px solid var(--gray-color-300);
+    padding: 20px;
+    background: var(--white-color);
+    text-align: center;
+}
+
+.main-image img {
+    max-width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain;
+}
+
+.thumbnail-images {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+.thumbnail-item {
+    width: 80px;
+    height: 80px;
+    border: 2px solid var(--gray-color-300);
+    cursor: pointer;
+    padding: 5px;
+    background: var(--white-color);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.thumbnail-item:hover,
+.thumbnail-item.active {
+    border-color: var(--primary-color);
+}
+
+.thumbnail-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Product Info */
+.product-info {
+    padding-left: 30px;
+}
+
+.category-tag {
+    font-size: 0.9em;
+    color: var(--gray-color-500);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.product-title {
+    font-family: var(--heading-font);
+    font-size: 2.2em;
+    color: var(--dark-color);
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.product-price {
+    margin-bottom: 25px;
+}
+
+.product-price .price {
+    font-family: var(--heading-font);
+    font-size: 2.5em;
+    color: var(--primary-color);
+    font-weight: 700;
+    margin: 0;
+}
+
+.product-stock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: var(--light-blue-color);
+    border-left: 4px solid var(--primary-color);
+}
+
+.stock-label {
+    font-weight: 600;
+    color: var(--dark-color);
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.stock-value {
+    font-weight: 700;
+    font-size: 1.1em;
+}
+
+.stock-value.in-stock {
+    color: #28a745;
+}
+
+.stock-value.low-stock {
+    color: #ffc107;
+}
+
+.stock-value.out-of-stock {
+    color: #dc3545;
+}
+
+/* Product Actions */
+.product-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.product-actions .btn {
+    min-width: 150px;
+}
+
+.btn-outline-accent {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.btn-outline-accent:hover {
+    background-color: #dc3545;
+    color: var(--white-color);
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 0;
+    border: none;
+}
+
+.modal-header {
+    background-color: var(--gray-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding: 20px 30px;
+}
+
+.modal-header .modal-title {
+    font-family: var(--heading-font);
+    font-weight: 500;
+    font-size: 1.3em;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.modal-footer {
+    padding: 20px 30px;
+    border-top: 1px solid var(--gray-color-300);
+}
+
+/* Form Styles in Modal */
+.modal-body .form-label {
+    font-family: var(--heading-font);
+    font-size: 1.1em;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.modal-body .form-control {
+    height: 50px;
+    border: 2px solid var(--gray-color-300);
+    border-radius: 0;
+    padding: 0 15px;
+    font-size: 1.1em;
+}
+
+.modal-body .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: none;
+}
+
+/* Loading State */
+#loading {
+    padding: 100px 20px;
+}
+
+/* Error State */
+.error-state {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.error-state h4 {
+    font-family: var(--heading-font);
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+/* Responsive */
+@media only screen and (max-width: 991px) {
+    #productDetail {
+        padding: 20px;
+    }
+}
+.product-info {
+    padding-left: 0;
+    margin-top: 30px;
+}
+
+.product-images {
+    position: static;
+}
+
+.product-title {
+    font-size: 1.8em;
+}
+
+.product-price .price {
+    font-size: 2em;
+}
+@media only screen and (max-width: 767px) {
+    .product-actions {
+        flex-direction: column;
+    }
+}
+.product-actions .btn {
+    min-width: 100%;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-header,
+.modal-footer {
+    padding: 15px 20px;
+}
+
+.thumbnail-images {
+    justify-content: center;
+}
+@media only screen and (max-width: 575px) {
+    .product-title {
+        font-size: 1.5em;
+    }
+}
+.product-price .price {
+    font-size: 1.8em;
+}
+
+.product-stock {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}

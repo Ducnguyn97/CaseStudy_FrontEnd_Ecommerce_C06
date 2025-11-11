@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm sản phẩm - Tech Store</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/product-add.css">
+    <link rel="stylesheet" href="../css/logo.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol xmlns="http://www.w3.org/2000/svg" id="user" viewBox="0 0 16 16">
+        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="cart" viewBox="0 0 16 16">
+        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="navbar-icon" viewBox="0 0 16 16">
+        <path d="M14 10.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 .5-.5zm0-3a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0 0 1h7a.5.5 0 0 0 .5-.5zm0-3a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0 0 1h11a.5.5 0 0 0 .5-.5z" />
+    </symbol>
+</svg>
+
+<header id="header" class="site-header header-scrolled position-fixed text-black bg-light">
+    <nav id="header-nav" class="navbar navbar-expand-lg px-3 mb-3">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../index.html">
+                <img src="../images/main-logo.png" class="logo" alt="Tech Store">
+            </a>
+            <button class="navbar-toggler d-flex d-lg-none order-3 p-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#bdNavbar">
+                <svg class="navbar-icon"><use xlink:href="#navbar-icon"></use></svg>
+            </button>
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="bdNavbar">
+                <div class="offcanvas-header px-4 pb-0">
+                    <a class="navbar-brand" href="../index.html">
+                        <img src="../images/main-logo.png" class="logo" alt="Tech Store">
+                    </a>
+                    <button type="button" class="btn-close btn-close-black" data-bs-dismiss="offcanvas"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul id="navbar" class="navbar-nav text-uppercase justify-content-end align-items-center flex-grow-1 pe-3">
+                        <li class="nav-item">
+                            <a class="nav-link me-4" href="../index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link me-4 active" href="product-list.html">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link me-4" href="order-list.html">My Orders</a>
+                        </li>
+                        <li class="nav-item">
+                            <div class="user-items ps-5">
+                                <ul class="d-flex justify-content-end list-unstyled">
+                                    <li class="pe-3">
+                                        <a href="#" id="userInfo">
+                                            <svg class="user"><use xlink:href="#user"></use></svg>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="create-order.html">
+                                            <svg class="cart"><use xlink:href="#cart"></use></svg>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<section class="padding-large" style="padding-top: 150px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="display-header pb-3 mb-4">
+                    <h2 class="display-7 text-dark text-uppercase">Thêm sản phẩm mới</h2>
+                </div>
+
+                <form id="productForm" class="product-form" enctype="multipart/form-data">
+                    <div class="form-section">
+                        <h5 class="section-title text-uppercase">Thông tin cơ bản</h5>
+
+                        <div class="mb-4">
+                            <label for="productName" class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="productName" name="name" required>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="productPrice" class="form-label">Giá <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="productPrice" name="price"
+                                       min="0" step="1000" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="productStock" class="form-label">Số lượng <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="productStock" name="stock"
+                                       min="0" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="productCategory" class="form-label">Danh mục <span class="text-danger">*</span></label>
+                            <select class="form-select" id="productCategory" name="categoryId" required>
+                                <option value="">-- Chọn danh mục --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h5 class="section-title text-uppercase">Hình ảnh sản phẩm</h5>
+
+                        <div class="mb-4">
+                            <label for="productImages" class="form-label">Chọn ảnh (có thể chọn nhiều)</label>
+                            <input type="file" class="form-control" id="productImages" name="images"
+                                   accept="image/*" multiple>
+                            <small class="form-text text-muted">Chọn tối đa 5 ảnh. Định dạng: JPG, PNG, GIF</small>
+                        </div>
+
+                        <div id="imagePreview" class="image-preview-container"></div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-dark btn-medium text-uppercase" id="btnSubmit">
+                            Thêm sản phẩm
+                        </button>
+                        <a href="product-list.html" class="btn btn-outline-dark btn-medium text-uppercase">
+                            Hủy
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer id="footer" class="overflow-hidden padding-large">
+    <div class="container">
+        <div class="row">
+            <div class="footer-top-area">
+                <div class="row d-flex flex-wrap justify-content-between">
+                    <div class="col-lg-3 col-sm-6 pb-3">
+                        <div class="footer-menu">
+                            <img src="../images/main-logo.png" alt="logo">
+                            <p>Your trusted partner for technology products.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="../js/jquery-1.11.0.min.js"></script>
+<script src="../js/bootstrap.bundle.min.js"></script>
+<script src="../js/product-add.js"></script>
+</body>
+</html>

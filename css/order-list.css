@@ -1,0 +1,211 @@
+/* Order List Styles */
+.order-card {
+    border: 1px solid var(--gray-color-300);
+    border-radius: 0;
+    margin-bottom: 30px;
+    background: var(--white-color);
+    transition: all 0.3s ease;
+}
+
+.order-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: var(--primary-color);
+}
+
+.order-header {
+    background-color: var(--gray-color);
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--gray-color-300);
+}
+
+.order-header strong {
+    font-family: var(--heading-font);
+    font-size: 1.4em;
+    color: var(--dark-color);
+    text-transform: uppercase;
+}
+
+.order-header small {
+    font-size: 0.9em;
+    color: var(--gray-color-500);
+}
+
+.order-body {
+    padding: 25px;
+}
+
+.order-body h6 {
+    font-family: var(--heading-font);
+    font-size: 1.2em;
+    color: var(--dark-color);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.status-badge {
+    font-size: 0.75em;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: var(--heading-font);
+}
+
+.status-PENDING {
+    background-color: #ffc107;
+    color: var(--dark-color);
+}
+
+.status-CONFIRMED {
+    background-color: #17a2b8;
+    color: var(--white-color);
+}
+
+.status-PROCESSING {
+    background-color: #007bff;
+    color: var(--white-color);
+}
+
+.status-SHIPPED {
+    background-color: #6f42c1;
+    color: var(--white-color);
+}
+
+.status-DELIVERED {
+    background-color: #28a745;
+    color: var(--white-color);
+}
+
+.status-CANCELLED {
+    background-color: #dc3545;
+    color: var(--white-color);
+}
+
+.order-product-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-color);
+}
+
+.order-product-item:last-child {
+    border-bottom: none;
+}
+
+.order-product-item h6 {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.order-product-item .product-meta {
+    color: var(--gray-color-500);
+    font-size: 0.95em;
+}
+
+.order-actions .btn {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.empty-box {
+    padding: 60px 20px;
+}
+
+.empty-box h4 {
+    font-family: var(--heading-font);
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 0;
+    border: none;
+}
+
+.modal-header {
+    background-color: var(--gray-color);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.modal-header .modal-title {
+    font-family: var(--heading-font);
+    font-weight: 500;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.modal-body h6 {
+    font-family: var(--heading-font);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.modal-body .table {
+    margin-top: 20px;
+}
+
+.modal-body .table thead {
+    background-color: var(--gray-color);
+}
+
+.modal-body .table th {
+    font-family: var(--heading-font);
+    text-transform: uppercase;
+    font-size: 0.9em;
+    color: var(--dark-color);
+    border: none;
+}
+
+.modal-body .table td {
+    vertical-align: middle;
+    padding: 15px;
+}
+
+.order-summary-info {
+    background: var(--light-blue-color);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.order-summary-info .row {
+    margin-bottom: 10px;
+}
+
+.order-summary-info .row:last-child {
+    margin-bottom: 0;
+}
+
+.order-summary-info strong {
+    font-family: var(--heading-font);
+}
+
+/* Responsive */
+@media only screen and (max-width: 768px) {
+    .order-header {
+        padding: 15px;
+    }
+
+    .order-body {
+        padding: 15px;
+    }
+
+    .order-header .row > div {
+        margin-bottom: 10px;
+    }
+
+    .order-actions {
+        text-align: center !important;
+    }
+
+    .order-actions .btn {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+}
