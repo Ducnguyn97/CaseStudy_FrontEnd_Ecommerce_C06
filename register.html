@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | MiniStore</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        body { font-family: 'Lato', sans-serif; background-color: #f4f7f9; }
+        .register-container {
+            max-width: 400px;
+            margin: 80px auto;
+            padding: 40px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .register-container h3 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .form-control {
+            border-radius: 10px;
+            padding: 10px 15px;
+        }
+        .btn-primary {
+            width: 100%;
+            border-radius: 10px;
+            background-color: #5a9bd5;
+            border: none;
+            padding: 10px;
+            font-weight: 500;
+        }
+        .btn-primary:hover { background-color: #3b82c4; }
+        .text-link { text-align: center; margin-top: 15px; }
+        #errorMsg { color: red; font-weight: 500; margin-top: 10px; }
+        #successMsg { color: green; font-weight: 500; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <h3>ĐĂNG KÝ TÀI KHOẢN</h3>
+    <form id="registerForm">
+        <div class="mb-3">
+            <label>Username</label>
+            <input type="text" id="username" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" id="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Password</label>
+            <input type="password" id="password" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Phone Number</label>
+            <input type="text" id="phoneNumber" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Address</label>
+            <input type="text" id="address" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+    <div class="text-link">Bạn đã có tài khoản? <a href="login.html">Đăng nhập</a></div>
+    <div id="errorMsg" class="text-center"></div>
+    <div id="successMsg" class="text-center"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $("#registerForm").submit(function(e) {
+        e.preventDefault();
+        $("#errorMsg").html("");
+        $("#successMsg").html("");
+
+        const username = $("#username").val().trim();
+        const email = $("#email").val().trim();
+        const password = $("#password").val();
+        const phoneNumber = $("#phoneNumber").val().trim();
+        const address = $("#address").val().trim();
+
+        // Validation client-side
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{6,12}$/;
+        const phoneRegex = /^0\d{9}$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (username.length < 3) {
+            $("#errorMsg").html("Username phải có ít nhất 3 ký tự");
+            return;
+        }
+        if (!emailRegex.test(email)) {
+            $("#errorMsg").html("Email không hợp lệ");
+            return;
+        }
+        if (!passwordRegex.test(password)) {
+            $("#errorMsg").html("Password phải 6-12 ký tự, có chữ, số và ký tự đặc biệt");
+            return;
+        }
+        if (!phoneRegex.test(phoneNumber)) {
+            $("#errorMsg").html("Số điện thoại phải đủ 10 số và bắt đầu bằng 0");
+            return;
+        }
+        if (address.length === 0) {
+            $("#errorMsg").html("Địa chỉ không được để trống");
+            return;
+        }
+
+        // POST dữ liệu lên server
+        $.ajax({
+            url: "http://localhost:8080/api/register",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ username, email, password, phoneNumber, address, role: "ROLE_USER" }),
+            success: function() {
+                // Thông báo thành công
+                if (confirm("Đăng ký thành công! Nhấn OK để sang trang đăng nhập")) {
+                    window.location.href="login.html";
+                }
+            },
+            error: function(xhr) {
+                $("#errorMsg").html(xhr.responseText || "Đăng ký thất bại, vui lòng thử lại");
+            }
+        });
+    });
+</script>
+</body>
+</html>
