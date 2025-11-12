@@ -1,3 +1,4 @@
+// product-list.js
 const API_BASE_URL = 'http://localhost:8080/api';
 const CURRENT_USER_ID = 1;
 
@@ -36,6 +37,42 @@ $(document).ready(function() {
         const priceRange = $(this).data('price');
         filterByPrice(priceRange);
     });
+
+    // Open detail by clicking the whole card
+    $(document).on('click', '.product-card', function(e) {
+        // Ignore clicks on inner action buttons
+        if ($(e.target).closest('.product-actions').length) {
+            return;
+        }
+        const id = $(this).data('id');
+        if (id != null) {
+            window.location.href = 'product-detail.html?id=' + id;
+        }
+    });
+
+    // Keyboard accessibility: Enter to open details
+    $(document).on('keydown', '.product-card', function(e) {
+        if (e.key === 'Enter') {
+            const id = $(this).data('id');
+            if (id != null) {
+                window.location.href = 'product-detail.html?id=' + id;
+            }
+        }
+    });
+
+    // Add to cart (delegate)
+    $(document).on('click', '.btn-add-to-cart', function(e) {
+        e.stopPropagation();
+        const id = Number($(this).data('id'));
+        addToCart(id);
+    });
+
+    // Delete product (delegate)
+    $(document).on('click', '.btn-delete-product', function(e) {
+        e.stopPropagation();
+        const id = Number($(this).data('id'));
+        deleteProduct(id);
+    });
 });
 
 function loadCategories() {
@@ -46,7 +83,7 @@ function loadCategories() {
             allCategories = categories;
             displayCategories(categories);
         },
-        error: function(xhr) {
+        error: function() {
             console.error('Không thể tải danh mục');
         }
     });
@@ -79,7 +116,7 @@ function loadProducts() {
         success: function(products) {
             $('#loading').hide();
 
-            if (products.length === 0) {
+            if (!products || products.length === 0) {
                 $('#emptyState').show();
                 return;
             }
@@ -88,7 +125,7 @@ function loadProducts() {
             filteredProducts = products;
             displayProducts(products);
         },
-        error: function(xhr) {
+        error: function() {
             $('#loading').hide();
             alert('✗ Không thể tải danh sách sản phẩm');
         }
@@ -96,7 +133,7 @@ function loadProducts() {
 }
 
 function displayProducts(products) {
-    if (products.length === 0) {
+    if (!products || products.length === 0) {
         $('#productGrid').empty();
         $('#emptyState').show();
         return;
@@ -111,23 +148,25 @@ function displayProducts(products) {
 
         html += `
             <div class="col-lg-4 col-md-6">
-                <div class="product-card">
+                <div class="product-card" data-id="${product.id}" role="button" tabindex="0" aria-label="Xem chi tiết ${escapeHtml(product.name)}">
                     <div class="image-holder">
-                        <img src="${imageUrl}" alt="${product.name}" 
-                             onerror="this.src='../images/product-placeholder.jpg'">
+                        <img src="${imageUrl}" alt="${escapeHtml(product.name)}">
                         <span class="stock-badge ${stockStatus.class}">${stockStatus.text}</span>
                     </div>
                     <div class="card-detail">
-                        <p class="category-name">${product.category ? product.category.name : 'Chưa phân loại'}</p>
-                        <h3 class="card-title">
-                            <a href="product-detail.html?id=${product.id}">${product.name}</a>
-                        </h3>
+                        <p class="category-name">${product.category ? escapeHtml(product.category.name) : 'Chưa phân loại'}</p>
+                        <h3 class="card-title">${escapeHtml(product.name)}</h3>
                         <p class="item-price">${formatCurrency(product.price)}</p>
-                        <div class="product-actions">
-                            <a href="product-detail.html?id=${product.id}" class="btn btn-outline-dark">
-                                Chi tiết
-                            </a>
-                            <button class="btn btn-outline-accent" onclick="deleteProduct(${product.id})">
+                        <div class="product-actions d-flex gap-2">
+                            <button
+                                class="btn btn-dark btn-add-to-cart"
+                                data-id="${product.id}"
+                                ${product.stock === 0 ? 'disabled' : ''}>
+                                Thêm vào giỏ hàng
+                            </button>
+                            <button
+                                class="btn btn-outline-accent btn-delete-product"
+                                data-id="${product.id}">
                                 Xóa
                             </button>
                         </div>
@@ -145,7 +184,7 @@ function filterProducts(keyword) {
 
     if (keyword) {
         filtered = filtered.filter(p =>
-            p.name.toLowerCase().includes(keyword)
+            (p.name || '').toLowerCase().includes(keyword)
         );
     }
 
@@ -162,10 +201,10 @@ function filterByCategory(categoryId) {
         );
     }
 
-    const keyword = $('#searchInput').val().toLowerCase();
+    const keyword = ($('#searchInput').val() || '').toLowerCase();
     if (keyword) {
         filtered = filtered.filter(p =>
-            p.name.toLowerCase().includes(keyword)
+            (p.name || '').toLowerCase().includes(keyword)
         );
     }
 
@@ -183,10 +222,10 @@ function filterByPrice(priceRange) {
         );
     }
 
-    const keyword = $('#searchInput').val().toLowerCase();
+    const keyword = ($('#searchInput').val() || '').toLowerCase();
     if (keyword) {
         filtered = filtered.filter(p =>
-            p.name.toLowerCase().includes(keyword)
+            (p.name || '').toLowerCase().includes(keyword)
         );
     }
 
@@ -222,7 +261,7 @@ function deleteProduct(productId) {
 }
 
 function getStockStatus(stock) {
-    if (stock === 0) {
+    if (!stock || stock === 0) {
         return { class: 'out-of-stock', text: 'Hết hàng' };
     } else if (stock <= 5) {
         return { class: 'low-stock', text: 'Sắp hết' };
@@ -235,5 +274,69 @@ function formatCurrency(amount) {
     return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
         currency: 'VND'
-    }).format(amount);
+    }).format(amount || 0);
+}
+
+/* =========================== Cart (localStorage) =========================== */
+function getCartKey() {
+    return `cart_${CURRENT_USER_ID}`;
+}
+
+function getCart() {
+    try {
+        const raw = localStorage.getItem(getCartKey());
+        return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+        console.warn('Cart parse error', e);
+        return [];
+    }
+}
+
+function saveCart(items) {
+    try {
+        localStorage.setItem(getCartKey(), JSON.stringify(items || []));
+    } catch (e) {
+        console.warn('Cart save error', e);
+    }
+}
+
+function addToCart(productId) {
+    const product = allProducts.find(p => p.id == productId);
+    if (!product) {
+        alert('✗ Không tìm thấy sản phẩm.');
+        return;
+    }
+    if (!product.stock || product.stock <= 0) {
+        alert('✗ Sản phẩm đã hết hàng.');
+        return;
+    }
+
+    const cart = getCart();
+    const item = cart.find(i => i.productId == productId);
+
+    if (item) {
+        // Không vượt quá tồn kho hiện tại
+        if (item.quantity < product.stock) {
+            item.quantity += 1;
+        } else {
+            alert('✗ Số lượng trong giỏ đã đạt tồn kho tối đa.');
+            return;
+        }
+    } else {
+        cart.push({ productId: productId, quantity: 1 });
+    }
+
+    saveCart(cart);
+    alert(`✓ Đã thêm "${product.name}" vào giỏ hàng`);
+}
+
+/* =========================== Utilities =========================== */
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 }
