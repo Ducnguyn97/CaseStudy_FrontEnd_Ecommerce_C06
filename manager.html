@@ -54,7 +54,7 @@
         let editUserId;
 
         if(!token){
-            contentArea.html('<h4 class="text-danger">Bạn chưa đăng nhập. Vui lòng đăng nhập để truy cập Admin Panel.</h4>');
+            contentArea.html('<h4 class="text-danger">Bạn chưa đăng nhập. Vui lòng click vào <a href="login.html" class="text-primary text-decoration-underline">đăng nhập</a> để truy cập Admin Panel.</h4>');
             return;
         }
 
@@ -87,7 +87,9 @@
         let userSize = 5;
 
         function loadUsers(search="") {
-            contentArea.html("<h4>Loading users...</h4>");
+            $("#btnProducts").click(() => {
+                window.location.href = "product_manager.html";
+            });
             $.ajax({
                 url: `${API_BASE}/users/search?keyword=${search}&page=${userPage}&size=${userSize}`,
                 type: "GET",
