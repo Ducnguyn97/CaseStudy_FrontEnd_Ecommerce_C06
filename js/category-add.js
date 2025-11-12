@@ -151,8 +151,8 @@ $(document).ready(function () {
                 } else if (xhr.responseText) {
                     errorMsg = xhr.responseText;
                 }
-                console.error('[category-add] POST error', { status, error: errorMsg });
-                alert(`✗ Lỗi (${status || 'n/a'}): ${errorMsg}`);
+               // console.error('[category-add] POST error', { status, error: errorMsg });
+                //alert(`✗ Lỗi (${status || 'n/a'}): ${errorMsg}`);
             },
             complete: function () {
                 setSubmitting(false);
