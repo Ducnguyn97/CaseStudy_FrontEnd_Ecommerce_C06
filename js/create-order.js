@@ -1,13 +1,12 @@
 const API_BASE_URL = 'http://localhost:8080/api';
 const CURRENT_USER_ID = 1;
 
-let products = [];
-let cart = {};
+let products = [];//danh sach san pham tu API
+let cart = {};//gio hang tam
 
 $(document).ready(function() {
     $('#userInfo').attr('title', 'User #' + CURRENT_USER_ID);
-    loadProducts();
-
+    loadProducts();// Tải danh sách sản phẩm từ backend
     $('#searchProduct').on('input', function() {
         const keyword = $(this).val();
         filterProducts(keyword);
@@ -92,15 +91,17 @@ function toggleProduct(productId) {
     if (!product || product.stock === 0) return;
 
     if (cart[productId]) {
+        // Nếu đã có trong giỏ → xóa
         delete cart[productId];
     } else {
+        // Thêm mới vào giỏ
         cart[productId] = {
             product: product,
-            quantity: 1
+            quantity: 1//mac dinh so luong bang 1
         };
     }
 
-    updateCartDisplay();
+    updateCartDisplay();//Cập nhật UI giỏ hàng
     displayProducts(products.filter(p =>
         p.name.toLowerCase().includes($('#searchProduct').val().toLowerCase())
     ));
