@@ -1,20 +1,32 @@
+// =========================
+// CẤU HÌNH & BIẾN TOÀN CỤC
+// =========================
 const API_BASE_URL = 'http://localhost:8080/api';
 const CURRENT_USER_ID = 1;
 
-let products = [];//danh sach san pham tu API
-let cart = {};//gio hang tam
+let products = []; // Danh sách sản phẩm lấy từ API
+let cart = {};     // Giỏ hàng tạm (lưu tạm trên client)
 
+// =========================
+// SỰ KIỆN CHÍNH KHI TRANG LOAD
+// =========================
 $(document).ready(function() {
     $('#userInfo').attr('title', 'User #' + CURRENT_USER_ID);
-    loadProducts();// Tải danh sách sản phẩm từ backend
+    loadProducts(); // Gọi API để tải danh sách sản phẩm
+
+    // Tìm kiếm sản phẩm theo tên khi nhập từ khóa
     $('#searchProduct').on('input', function() {
         const keyword = $(this).val();
         filterProducts(keyword);
     });
 
+    // Xử lý khi nhấn nút "Tạo đơn hàng"
     $('#btnCreateOrder').click(createOrder);
 });
 
+// =========================
+// HÀM TẢI DANH SÁCH SẢN PHẨM TỪ API
+// =========================
 function loadProducts() {
     $.ajax({
         url: `${API_BASE_URL}/products`,
@@ -23,7 +35,7 @@ function loadProducts() {
             products = data;
             displayProducts(products);
         },
-        error: function(xhr) {
+        error: function() {
             $('#productList').html(`
                 <div class="alert alert-danger">
                     <strong>Lỗi!</strong> Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.
@@ -33,6 +45,9 @@ function loadProducts() {
     });
 }
 
+// =========================
+// HIỂN THỊ DANH SÁCH SẢN PHẨM RA GIAO DIỆN
+// =========================
 function displayProducts(productList) {
     if (productList.length === 0) {
         $('#productList').html(`
@@ -79,6 +94,9 @@ function displayProducts(productList) {
     $('#productList').html(html);
 }
 
+// =========================
+// LỌC SẢN PHẨM THEO TỪ KHÓA TÌM KIẾM
+// =========================
 function filterProducts(keyword) {
     const filtered = products.filter(p =>
         p.name.toLowerCase().includes(keyword.toLowerCase())
@@ -86,29 +104,36 @@ function filterProducts(keyword) {
     displayProducts(filtered);
 }
 
+// =========================
+// THÊM HOẶC BỎ CHỌN MỘT SẢN PHẨM TRONG GIỎ
+// =========================
 function toggleProduct(productId) {
     const product = products.find(p => p.id === productId);
     if (!product || product.stock === 0) return;
 
     if (cart[productId]) {
-        // Nếu đã có trong giỏ → xóa
+        // Nếu sản phẩm đã có trong giỏ → xóa
         delete cart[productId];
     } else {
-        // Thêm mới vào giỏ
+        // Nếu chưa có → thêm vào giỏ hàng
         cart[productId] = {
             product: product,
-            quantity: 1//mac dinh so luong bang 1
+            quantity: 1 // Số lượng mặc định = 1
         };
     }
 
-    updateCartDisplay();//Cập nhật UI giỏ hàng
+    updateCartDisplay(); // Cập nhật giao diện giỏ hàng
     displayProducts(products.filter(p =>
         p.name.toLowerCase().includes($('#searchProduct').val().toLowerCase())
     ));
 }
 
+// =========================
+// CẬP NHẬT HIỂN THỊ GIỎ HÀNG
+// =========================
 function updateCartDisplay() {
     if (Object.keys(cart).length === 0) {
+        // Nếu giỏ trống
         $('#cartItems').html(`
             <div class="empty-cart text-center py-5">
                 <svg width="80" height="80" fill="currentColor" class="text-muted mb-3" viewBox="0 0 16 16">
@@ -119,6 +144,7 @@ function updateCartDisplay() {
         `);
         $('#btnCreateOrder').prop('disabled', true);
     } else {
+        // Nếu có sản phẩm trong giỏ
         let html = '';
         let totalAmount = 0;
         let totalQuantity = 0;
@@ -142,22 +168,16 @@ function updateCartDisplay() {
                         </div>
                         <div class="col-3">
                             <div class="quantity-control">
-                                <button class="btn" onclick="updateQuantity(${item.product.id}, -1)">
-                                    −
-                                </button>
+                                <button class="btn" onclick="updateQuantity(${item.product.id}, -1)">−</button>
                                 <input type="number" value="${item.quantity}" 
                                        min="1" max="${item.product.stock}"
                                        onchange="setQuantity(${item.product.id}, this.value)">
-                                <button class="btn" onclick="updateQuantity(${item.product.id}, 1)">
-                                    +
-                                </button>
+                                <button class="btn" onclick="updateQuantity(${item.product.id}, 1)">+</button>
                             </div>
                         </div>
                         <div class="col-1 text-end">
                             <button class="btn btn-sm btn-outline-danger btn-remove" 
-                                    onclick="removeFromCart(${item.product.id})">
-                                ✗
-                            </button>
+                                    onclick="removeFromCart(${item.product.id})">✗</button>
                         </div>
                     </div>
                     <div class="row mt-3">
@@ -170,6 +190,7 @@ function updateCartDisplay() {
             `;
         });
 
+        // Cập nhật tổng số lượng & tổng tiền
         $('#cartItems').html(html);
         $('#totalItems').text(Object.keys(cart).length);
         $('#totalQuantity').text(totalQuantity);
@@ -178,6 +199,9 @@ function updateCartDisplay() {
     }
 }
 
+// =========================
+// CẬP NHẬT SỐ LƯỢNG TỪ NÚT + HOẶC -
+// =========================
 function updateQuantity(productId, delta) {
     if (!cart[productId]) return;
 
@@ -198,6 +222,9 @@ function updateQuantity(productId, delta) {
     updateCartDisplay();
 }
 
+// =========================
+// NHẬP SỐ LƯỢNG THỦ CÔNG TRONG INPUT
+// =========================
 function setQuantity(productId, value) {
     if (!cart[productId]) return;
 
@@ -219,6 +246,9 @@ function setQuantity(productId, value) {
     updateCartDisplay();
 }
 
+// =========================
+// XÓA MỘT SẢN PHẨM KHỎI GIỎ HÀNG
+// =========================
 function removeFromCart(productId) {
     delete cart[productId];
     updateCartDisplay();
@@ -227,6 +257,9 @@ function removeFromCart(productId) {
     ));
 }
 
+// =========================
+// TẠO ĐƠN HÀNG (GỬI DỮ LIỆU LÊN BACKEND)
+// =========================
 function createOrder() {
     if (Object.keys(cart).length === 0) {
         alert('Vui lòng thêm sản phẩm vào giỏ hàng');
@@ -237,12 +270,11 @@ function createOrder() {
         return;
     }
 
+    // Chuẩn bị dữ liệu đơn hàng
     const orderItems = Object.values(cart).map(item => ({
         productId: item.product.id,
         quantity: item.quantity
     }));
-
-    console.log('Sending order data:', orderItems);
 
     $('#btnCreateOrder').prop('disabled', true).text('Đang xử lý...');
 
@@ -251,54 +283,25 @@ function createOrder() {
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(orderItems),
-        success: function(order) {
-            console.log('Order created successfully:', order);
-            alert('✓ Đặt hàng thành công!\n\nMã đơn hàng: #' + order.id + '\nTổng tiền: ' + formatCurrency(order.totalAmount));
-
+        success: function(response) {
+            alert('✓ Đặt hàng thành công!');
             cart = {};
             updateCartDisplay();
             loadProducts();
             $('#btnCreateOrder').prop('disabled', false).text('Đặt hàng');
-
-            setTimeout(() => {
-                window.location.href = 'order-list.html';
-            }, 1500);
+            setTimeout(() => window.location.href = 'order-list.html', 1500);
         },
-        error: function(xhr, status, error) {
-            // 🔥 HIỂN THỊ CHI TIẾT ERROR
-            console.log('=== FULL ERROR DETAILS ===');
-            console.log('Status:', xhr.status);
-            console.log('Status Text:', xhr.statusText);
-            console.log('Response Text:', xhr.responseText);
-            console.log('Ready State:', xhr.readyState);
-            console.log('Full XHR object:', xhr);
-
-            let errorMsg = 'Không thể tạo đơn hàng. Vui lòng thử lại sau.';
-
-            try {
-                if (xhr.responseJSON) {
-                    if (xhr.responseJSON.message) {
-                        errorMsg = xhr.responseJSON.message;
-                    } else if (xhr.responseJSON.error) {
-                        errorMsg = xhr.responseJSON.error;
-                    } else if (xhr.responseJSON.errors) {
-                        const errors = xhr.responseJSON.errors;
-                        errorMsg = Object.values(errors).join('\n');
-                    }
-                } else if (xhr.responseText) {
-                    errorMsg = xhr.responseText;
-                }
-            } catch (e) {
-                console.log('Error parsing response:', e);
-            }
-
-            console.log('Final error message:', errorMsg);
+        error: function(xhr) {
+            let errorMsg = xhr.responseJSON?.message || 'Không thể tạo đơn hàng';
             alert('✗ Lỗi: ' + errorMsg);
             $('#btnCreateOrder').prop('disabled', false).text('Đặt hàng');
         }
     });
 }
 
+// =========================
+// ĐỊNH DẠNG TIỀN TỆ (VNĐ)
+// =========================
 function formatCurrency(amount) {
     return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
