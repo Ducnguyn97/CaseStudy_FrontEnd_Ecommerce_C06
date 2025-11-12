@@ -83,8 +83,16 @@ function loadCategories() {
             allCategories = categories;
             displayCategories(categories);
         },
-        error: function() {
-            console.error('Không thể tải danh mục');
+        error: function(xhr, status, error) {
+            console.error('Category API Error:', {
+                status: xhr.status,
+                statusText: xhr.statusText,
+                responseText: xhr.responseText,
+                error: error
+            });
+
+            // Hiển thị danh mục mặc định nếu API lỗi
+            $('#categoryList').html('<li><a href="#" data-category="all" class="category-filter active">Tất cả</a></li>');
         }
     });
 }
@@ -115,6 +123,7 @@ function loadProducts() {
         method: 'GET',
         success: function(products) {
             $('#loading').hide();
+            console.log('Products loaded:', products); // Debug log
 
             if (!products || products.length === 0) {
                 $('#emptyState').show();
@@ -125,9 +134,33 @@ function loadProducts() {
             filteredProducts = products;
             displayProducts(products);
         },
-        error: function() {
+        error: function(xhr, status, error) {
             $('#loading').hide();
-            alert('✗ Không thể tải danh sách sản phẩm');
+            console.error('API Error:', {
+                status: xhr.status,
+                statusText: xhr.statusText,
+                responseText: xhr.responseText,
+                error: error
+            });
+
+            // Hiển thị thông báo lỗi chi tiết hơn
+            let errorMsg = 'Không thể tải danh sách sản phẩm';
+            if (xhr.status === 0) {
+                errorMsg = 'Không thể kết nối đến server. Kiểm tra kết nối và CORS.';
+            } else if (xhr.status === 404) {
+                errorMsg = 'API endpoint không tồn tại. Kiểm tra URL.';
+            } else if (xhr.status === 500) {
+                errorMsg = 'Lỗi server. Kiểm tra console backend.';
+            }
+
+            $('#productGrid').html(`
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        <strong>Lỗi:</strong> ${errorMsg}
+                        <br><small>URL: ${API_BASE_URL}/products</small>
+                    </div>
+                </div>
+            `);
         }
     });
 }

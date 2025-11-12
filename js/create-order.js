@@ -242,6 +242,8 @@ function createOrder() {
         quantity: item.quantity
     }));
 
+    console.log('Sending order data:', orderItems);
+
     $('#btnCreateOrder').prop('disabled', true).text('Đang xử lý...');
 
     $.ajax({
@@ -250,30 +252,47 @@ function createOrder() {
         contentType: 'application/json',
         data: JSON.stringify(orderItems),
         success: function(order) {
+            console.log('Order created successfully:', order);
             alert('✓ Đặt hàng thành công!\n\nMã đơn hàng: #' + order.id + '\nTổng tiền: ' + formatCurrency(order.totalAmount));
 
-            // Reset giỏ hàng
             cart = {};
             updateCartDisplay();
             loadProducts();
-
             $('#btnCreateOrder').prop('disabled', false).text('Đặt hàng');
 
-            // Chuyển đến trang danh sách đơn hàng
             setTimeout(() => {
                 window.location.href = 'order-list.html';
             }, 1500);
         },
-        error: function(xhr) {
+        error: function(xhr, status, error) {
+            // 🔥 HIỂN THỊ CHI TIẾT ERROR
+            console.log('=== FULL ERROR DETAILS ===');
+            console.log('Status:', xhr.status);
+            console.log('Status Text:', xhr.statusText);
+            console.log('Response Text:', xhr.responseText);
+            console.log('Ready State:', xhr.readyState);
+            console.log('Full XHR object:', xhr);
+
             let errorMsg = 'Không thể tạo đơn hàng. Vui lòng thử lại sau.';
 
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                errorMsg = xhr.responseJSON.message;
-            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                const errors = xhr.responseJSON.errors;
-                errorMsg = Object.values(errors).join('\n');
+            try {
+                if (xhr.responseJSON) {
+                    if (xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    } else if (xhr.responseJSON.error) {
+                        errorMsg = xhr.responseJSON.error;
+                    } else if (xhr.responseJSON.errors) {
+                        const errors = xhr.responseJSON.errors;
+                        errorMsg = Object.values(errors).join('\n');
+                    }
+                } else if (xhr.responseText) {
+                    errorMsg = xhr.responseText;
+                }
+            } catch (e) {
+                console.log('Error parsing response:', e);
             }
 
+            console.log('Final error message:', errorMsg);
             alert('✗ Lỗi: ' + errorMsg);
             $('#btnCreateOrder').prop('disabled', false).text('Đặt hàng');
         }
