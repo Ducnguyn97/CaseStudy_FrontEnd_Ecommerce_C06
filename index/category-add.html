@@ -4,20 +4,18 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sản phẩm - Tech Store</title>
+    <title>Thêm danh mục - Tech Store</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/product-list.css">
+    <!-- Tái sử dụng style form sẵn có -->
+    <link rel="stylesheet" href="../css/product-add.css">
     <link rel="stylesheet" href="../css/logo.css">
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-    <symbol xmlns="http://www.w3.org/2000/svg" id="search" viewBox="0 0 32 32">
-        <path fill="currentColor" d="M19 3C13.488 3 9 7.488 9 13c0 2.395.84 4.59 2.25 6.313L3.281 27.28l1.439 1.44l7.968-7.969A9.922 9.922 0 0 0 19 23c5.512 0 10-4.488 10-10S24.512 3 19 3zm0 2c4.43 0 8 3.57 8 8s-3.57 8-8 8s-8-3.57-8-8s3.57-8 8-8z" />
-    </symbol>
     <symbol xmlns="http://www.w3.org/2000/svg" id="user" viewBox="0 0 16 16">
         <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
     </symbol>
@@ -32,7 +30,7 @@
 <header id="header" class="site-header header-scrolled position-fixed text-black bg-light">
     <nav id="header-nav" class="navbar navbar-expand-lg px-3 mb-3">
         <div class="container-fluid">
-            <a class="navbar-brand" href="../index/index.html">
+            <a class="navbar-brand" href="../index.html">
                 <img src="../images/main-logo.png" class="logo" alt="Tech Store">
             </a>
             <button class="navbar-toggler d-flex d-lg-none order-3 p-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#bdNavbar">
@@ -40,7 +38,7 @@
             </button>
             <div class="offcanvas offcanvas-end" tabindex="-1" id="bdNavbar">
                 <div class="offcanvas-header px-4 pb-0">
-                    <a class="navbar-brand" href="index.html">
+                    <a class="navbar-brand" href="../index.html">
                         <img src="../images/main-logo.png" class="logo" alt="Tech Store">
                     </a>
                     <button type="button" class="btn-close btn-close-black" data-bs-dismiss="offcanvas"></button>
@@ -48,10 +46,10 @@
                 <div class="offcanvas-body">
                     <ul id="navbar" class="navbar-nav text-uppercase justify-content-end align-items-center flex-grow-1 pe-3">
                         <li class="nav-item">
-                            <a class="nav-link me-4" href="index.html">Home</a>
+                            <a class="nav-link me-4" href="../index.html">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link me-4 active" href="product-list.html">Products</a>
+                            <a class="nav-link me-4" href="product-list.html">Products</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link me-4" href="order-list.html">My Orders</a>
@@ -84,85 +82,94 @@
 
 <section class="padding-large" style="padding-top: 150px;">
     <div class="container">
-        <div class="row">
-            <div class="col-lg-3">
-                <!-- Sidebar Filter -->
-                <div class="sidebar">
-                    <h5 class="widget-title text-uppercase">Tìm kiếm</h5>
-                    <div class="widget-search-bar mb-4">
-                        <div class="position-relative">
-                            <input type="text" class="form-control search-field" id="searchInput"
-                                   placeholder="Tìm sản phẩm...">
-                            <svg class="search-icon"><use xlink:href="#search"></use></svg>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="display-header pb-3 mb-4">
+                    <h2 class="display-7 text-dark text-uppercase">Thêm danh mục mới</h2>
+                </div>
+
+                <form id="categoryForm" class="product-form">
+                    <div class="form-section">
+                        <h5 class="section-title text-uppercase">Thông tin danh mục</h5>
+
+                        <div class="mb-4">
+                            <label for="categoryName" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="categoryName" name="name" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="categoryDescription" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="categoryDescription" name="description" rows="4" placeholder="Mô tả ngắn về danh mục"></textarea>
                         </div>
                     </div>
 
-                    <h5 class="widget-title text-uppercase mt-4">Danh mục</h5>
-                    <ul class="sidebar-list list-unstyled" id="categoryList">
-                        <li><a href="#" data-category="all" class="category-filter active">Tất cả</a></li>
-                    </ul>
-
-                    <h5 class="widget-title text-uppercase mt-4">Giá</h5>
-                    <ul class="sidebar-list list-unstyled">
-                        <li><a href="#" data-price="all" class="price-filter active">Tất cả</a></li>
-                        <li><a href="#" data-price="0-5000000" class="price-filter">Dưới 5 triệu</a></li>
-                        <li><a href="#" data-price="5000000-10000000" class="price-filter">5-10 triệu</a></li>
-                        <li><a href="#" data-price="10000000-20000000" class="price-filter">10-20 triệu</a></li>
-                        <li><a href="#" data-price="20000000-999999999" class="price-filter">Trên 20 triệu</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="col-lg-9">
-
-                <div class="display-header d-flex justify-content-between pb-3 mb-4">
-                    <h2 class="display-7 text-dark text-uppercase">Danh sách sản phẩm</h2>
-                    <div class="btn-right">
-                        <a href="product-add.html" class="btn btn-medium btn-dark text-uppercase btn-rounded-none">
-                            Thêm sản phẩm
-                        </a>
-                        <a href="category-add.html" class="btn btn-medium btn-dark text-uppercase btn-rounded-none">
-                            Thêm Category
+                    <div class="form-actions d-flex gap-2 flex-wrap">
+                        <button type="submit" class="btn btn-dark btn-medium text-uppercase" id="btnSubmit">
+                            Thêm danh mục
+                        </button>
+                        <button
+                                type="button"
+                                class="btn btn-outline-secondary btn-medium text-uppercase"
+                                id="btnViewCategories"
+                                data-bs-toggle="modal"
+                                data-bs-target="#categoryModal"
+                        >
+                            Xem danh mục đã tạo
+                        </button>
+                        <a href="product-list.html" class="btn btn-outline-dark btn-medium text-uppercase">
+                            Hủy
                         </a>
                     </div>
-                </div>
-
-                <div id="loading" class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Đang tải...</span>
-                    </div>
-                </div>
-
-                <div id="productGrid" class="row g-4"></div>
-
-                <div id="emptyState" class="text-center py-5" style="display: none;">
-                    <h4 class="text-uppercase">Không tìm thấy sản phẩm</h4>
-                    <p class="text-muted">Vui lòng thử lại với từ khóa khác</p>
-                </div>
+                </form>
             </div>
         </div>
     </div>
 </section>
 
-<footer id="footer" class="overflow-hidden padding-large">
-    <div class="container">
-        <div class="row">
-            <div class="footer-top-area">
-                <div class="row d-flex flex-wrap justify-content-between">
-                    <div class="col-lg-3 col-sm-6 pb-3">
-                        <div class="footer-menu">
-                            <img src="../images/main-logo.png" alt="logo">
-                            <p>Your trusted partner for technology products.</p>
-                        </div>
-                    </div>
+<!-- Modal danh sách danh mục -->
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-uppercase" id="categoryModalLabel">Danh sách danh mục</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <div id="categoryListLoading" class="text-center py-3" style="display:none;">Đang tải...</div>
+                <div id="categoryListEmpty" class="text-center text-muted py-3" style="display:none;">Chưa có danh mục nào.</div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="categoryTable" style="display:none;">
+                        <thead class="table-light">
+                        <tr>
+                            <th style="width: 20%;">ID</th>
+                            <th style="width: 30%;">Tên danh mục</th>
+                            <th style="width: 35%;">Mô tả</th>
+                            <th style="width: 15%;" class="text-center">Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody id="categoryTableBody"></tbody>
+                    </table>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
-</footer>
+</div>
 
+<!-- ... footer giữ nguyên ... -->
+
+<!-- Script: jQuery, Bootstrap, API_BASE_URL và file JS xử lý -->
 <script src="../js/jquery-1.11.0.min.js"></script>
 <script src="../js/bootstrap.bundle.min.js"></script>
-<script src="../js/product-list.js"></script>
+
+<!-- Khai báo BASE_URL nếu trang này chưa có biến đó -->
+<script>
+    window.API_BASE_URL = window.API_BASE_URL || 'http://localhost:8080/api';
+</script>
+
+<script src="../js/category-add.js"></script>
 </body>
 </html>
